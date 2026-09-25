@@ -3,27 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bon Sayur Suara AI Bapak</title>
+    <title>Bon Sayur NASIR</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
         .font-receipt {
-            font-family: 'Courier Prime', monospace;
-        }
-        @keyframes pulse-ring {
-            0% { transform: scale(0.95); opacity: 0.8; }
-            50% { transform: scale(1.18); opacity: 0.3; }
-            100% { transform: scale(0.95); opacity: 0.8; }
-        }
-        .animate-pulse-ring {
-            animation: pulse-ring 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-variant-numeric: tabular-nums;
         }
     </style>
 </head>
@@ -36,8 +29,8 @@
                     <i data-lucide="bot" class="w-6 h-6 text-emerald-200"></i>
                 </div>
                 <div>
-                    <h1 class="font-extrabold text-lg leading-tight tracking-wide">Bon Sayur Suara AI</h1>
-                    <p class="text-[11px] text-emerald-200">Otomatis Pemisah Hari lewat Suara</p>
+                    <h1 class="font-extrabold text-lg leading-tight tracking-wide">Bon Sayur NASIR</h1>
+                    <p class="text-[11px] text-emerald-200">Pembuat Nota Otomatis Per Hari</p>
                 </div>
             </div>
             <button onclick="resetAllData()" class="text-emerald-100 hover:text-white p-2 rounded-xl text-xs bg-emerald-800/80 active:bg-emerald-900 flex items-center gap-1.5 transition">
@@ -48,33 +41,28 @@
 
     <main class="max-w-md mx-auto px-4 pt-4 space-y-4">
 
-        <!-- Voice Recorder & AI Trigger Card -->
-        <section class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col items-center text-center relative overflow-hidden">
+        <!-- Text Input & AI Trigger Card -->
+        <section class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-600"></div>
 
-            <div class="relative my-3">
-                <div id="micPulse" class="hidden absolute inset-0 bg-red-400 rounded-full animate-pulse-ring -m-2"></div>
-                <button id="micBtn" onclick="toggleVoiceRecognition()" class="relative z-10 w-20 h-20 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center shadow-xl transform active:scale-95 transition-all">
-                    <i id="micIcon" data-lucide="mic" class="w-10 h-10"></i>
-                </button>
-            </div>
-
-            <p id="micStatusText" class="font-bold text-slate-800 text-base mt-1">Tekan Mikrofon Lalu Bicara Bebas</p>
-            <p id="micHelpText" class="text-xs text-slate-500 mt-1 max-w-xs leading-relaxed">
-                Contoh ucapan:<br>
-                <span class="italic text-emerald-700 font-medium">"Hari senin ayam 75ribu, bawang merah 1kg 20ribu totalkan. Hari selasa daging 2kg 100rb minyak 50rb"</span>
-            </p>
-
-            <!-- Text Transcript & AI Process Box -->
-            <div id="transcriptBox" class="w-full mt-4 p-3 bg-slate-50 rounded-xl border border-slate-200 text-left space-y-2">
-                <div class="flex items-center justify-between text-xs font-bold text-slate-500">
-                    <span class="flex items-center gap-1"><i data-lucide="message-square-quote" class="w-3.5 h-3.5 text-emerald-600"></i> Teks Ucapan Suara:</span>
-                    <span id="listeningBadge" class="hidden text-red-500 font-semibold flex items-center gap-1 animate-pulse">● Mendengarkan...</span>
+            <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <label for="rawTextInput" class="text-xs font-bold text-slate-700 flex items-center gap-1.5 uppercase tracking-wider">
+                        <i data-lucide="edit-3" class="w-4 h-4 text-emerald-600"></i> Input Teks Catatan Belanja
+                    </label>
+                    <button onclick="clearTextInput()" class="text-slate-400 hover:text-red-500 text-xs font-medium transition flex items-center gap-1">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Hapus Teks
+                    </button>
                 </div>
+
+                <p class="text-xs text-slate-500 leading-relaxed">
+                    Ketik atau tempel catatan belanja harian Bapak di sini:<br>
+                </p>
+
+                <!-- Expanded Textarea Input -->
+                <textarea id="rawTextInput" rows="8" class="w-full text-sm font-medium text-slate-800 bg-slate-50 p-3.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:bg-white focus:outline-none resize-y leading-relaxed transition shadow-inner" placeholder="Contoh: Hari senin Daging 1kg 100, Telur 1/2kg 15, Bawang Merah 1kg 20. Hari selasa Minyak 2 liter 35, Tepung 15"></textarea>
                 
-                <textarea id="rawSpeechInput" rows="3" class="w-full text-xs font-medium text-slate-700 bg-white p-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:outline-none resize-none" placeholder="Hasil suara ucapan akan muncul di sini... Anda juga dapat mengedit teks ini jika ada kata yang kurang tepat."></textarea>
-                
-                <button id="processAiBtn" onclick="processWithGemini()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow flex items-center justify-center gap-2 transition">
+                <button id="processAiBtn" onclick="processWithGemini()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl text-xs font-bold shadow-md flex items-center justify-center gap-2 transition">
                     <i data-lucide="sparkles" class="w-4 h-4 text-yellow-300"></i> Diproses dengan AI Sekarang
                 </button>
             </div>
@@ -97,7 +85,7 @@
                 </div>
                 <div>
                     <label class="block text-[11px] text-slate-500 mb-1 font-medium">Nama Toko/Bapak</label>
-                    <input type="text" id="storeName" oninput="updateReceiptHeader()" value="Bon Sayuran Bapak" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                    <input type="text" id="storeName" oninput="updateReceiptHeader()" value="Bon Sayuran NASIR" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                 </div>
             </div>
         </section>
@@ -108,21 +96,20 @@
                 <span id="dataStatusTag" class="text-[10px] bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full font-semibold">Kosong</span>
             </div>
 
-            <!-- Receipt Paper Element to Export -->
-            <div id="printableReceipt" class="bg-white p-5 rounded-xl border border-slate-300 shadow-md font-receipt text-slate-800 text-xs space-y-4 relative">
+            <!-- Receipt Paper Element -->
+            <div id="printableReceipt" class="bg-white p-6 rounded-2xl border border-slate-300 shadow-md font-receipt text-slate-800 text-sm space-y-4 relative">
                 
                 <!-- Receipt Header -->
-                <div class="text-center border-b-2 border-dashed border-slate-300 pb-3 space-y-0.5">
-                    <h2 id="receiptStoreTitle" class="font-bold text-base tracking-wider uppercase text-slate-900">BON SAYURAN BAPAK</h2>
-                    <p id="receiptCustomerText" class="text-[11px] text-slate-600">Pelanggan: Umumd/Tanpa Nama</p>
-                    <p id="receiptDateText" class="text-[10px] text-slate-500">Tanggal: -</p>
+                <div class="text-center border-b-2 border-slate-200 pb-3 space-y-1">
+                    <h2 id="receiptStoreTitle" class="font-extrabold text-base tracking-wide uppercase text-emerald-900">BON SAYURAN NASIR</h2>
+                    <p id="receiptCustomerText" class="text-xs font-semibold text-slate-600">Pelanggan: Umum / Tanpa Nama</p>
+                    <p id="receiptDateText" class="text-[11px] text-slate-500">Tanggal: -</p>
                 </div>
 
                 <!-- Day Groups Container -->
                 <div id="dayGroupsContainer" class="space-y-4">
-                    <!-- Dynamic rendering per day -->
                     <div class="text-center py-6 text-slate-400 italic text-xs">
-                        Belum ada data belanja. Silakan rekam suara ucapan di atas.
+                        Belum ada data belanja. Silakan ketikkan daftar belanja di atas.
                     </div>
                 </div>
 
@@ -130,20 +117,20 @@
                 <div class="border-t-2 border-slate-900 pt-3 mt-4 space-y-1">
                     <div class="flex justify-between items-center font-extrabold text-base text-slate-900">
                         <span>TOTAL KESELURUHAN:</span>
-                        <span id="grandTotalDisplay">Rp 0</span>
+                        <span id="grandTotalDisplay" class="text-emerald-800">Rp 0</span>
                     </div>
                 </div>
 
                 <!-- Footer Note -->
-                <div class="text-center text-[10px] text-slate-500 pt-2 border-t border-dashed border-slate-200">
+                <div class="text-center text-[11px] font-medium text-slate-500 pt-2 border-t border-dashed border-slate-200">
                     <p>Matur Nuwun / Terima Kasih Atas Kepercayaannya</p>
                 </div>
             </div>
 
             <!-- Export Action Buttons -->
             <div class="grid grid-cols-2 gap-3 pt-1">
-                <button onclick="downloadReceiptImage()" class="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl font-bold shadow-md flex items-center justify-center gap-2 text-xs transition">
-                    <i data-lucide="download" class="w-4 h-4"></i> Download Gambar
+                <button onclick="downloadReceiptImagesPerDay()" class="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl font-bold shadow-md flex items-center justify-center gap-2 text-xs transition">
+                    <i data-lucide="download" class="w-4 h-4"></i> Download JPG (Per Hari)
                 </button>
                 <button onclick="shareToWhatsApp()" class="w-full py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold shadow-md flex items-center justify-center gap-2 text-xs transition">
                     <i data-lucide="message-square" class="w-4 h-4"></i> Kirim ke WhatsApp
@@ -153,15 +140,15 @@
 
     </main>
 
+    <!-- Offscreen Container for Generating Day JPG Images -->
+    <div id="exportRenderContainer" class="fixed -left-[9999px] top-0 w-[400px] bg-white p-6 font-receipt text-slate-800 text-sm space-y-4"></div>
+
     <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs px-4 py-3 rounded-full shadow-2xl opacity-0 transition-all duration-300 pointer-events-none z-50 flex items-center gap-2 border border-slate-700 max-w-xs text-center">
         <i data-lucide="info" class="w-4 h-4 text-emerald-400 shrink-0"></i>
         <span id="toastMsg">Notifikasi</span>
     </div>
 
     <script>
-        // State variables
-        let isListening = false;
-        let recognition = null;
         let parsedReceiptData = {
             customerName: "",
             days: [],
@@ -170,7 +157,6 @@
 
         window.onload = function() {
             lucide.createIcons();
-            initSpeechRecognition();
             updateReceiptHeader();
             loadLocalStorage();
         };
@@ -183,106 +169,21 @@
             const custName = document.getElementById('customerName').value.trim();
             const storeName = document.getElementById('storeName').value.trim();
 
-            document.getElementById('receiptStoreTitle').innerText = (storeName || "BON SAYURAN BAPAK").toUpperCase();
+            document.getElementById('receiptStoreTitle').innerText = (storeName || "BON SAYURAN NASIR").toUpperCase();
             document.getElementById('receiptCustomerText').innerText = 'Pelanggan: ' + (custName || "Umum / Pelanggan");
         }
 
-        function initSpeechRecognition() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                showToast("Browser tidak mendukung pengenalan suara. Silakan ketik langsung teksnya.");
-                return;
-            }
-
-            recognition = new SpeechRecognition();
-            recognition.continuous = true;
-            recognition.interimResults = true;
-            recognition.lang = 'id-ID';
-
-            recognition.onstart = function() {
-                isListening = true;
-                updateMicUI(true);
-            };
-
-            recognition.onresult = function(event) {
-                let transcript = '';
-                for (let i = 0; i < event.results.length; ++i) {
-                    transcript += event.results[i][0].transcript;
-                }
-                document.getElementById('rawSpeechInput').value = transcript;
-            };
-
-            recognition.onerror = function(event) {
-                console.error("Speech Recognition error:", event.error);
-                stopListening();
-            };
-
-            recognition.onend = function() {
-                stopListening();
-            };
-        }
-
-        function toggleVoiceRecognition() {
-            if (!recognition) {
-                showToast("Pengenal suara tidak didukung di browser ini.");
-                return;
-            }
-            if (isListening) {
-                stopListening();
-            } else {
-                startListening();
-            }
-        }
-
-        function startListening() {
-            try {
-                recognition.start();
-                isListening = true;
-                document.getElementById('listeningBadge').classList.remove('hidden');
-                document.getElementById('rawSpeechInput').value = '';
-                showToast("Silakan bicara panjang...");
-            } catch (e) {
-                console.error(e);
-            }
-        }
-
-        function stopListening() {
-            isListening = false;
-            if (recognition) {
-                try { recognition.stop(); } catch(e){}
-            }
-            document.getElementById('listeningBadge').classList.add('hidden');
-            updateMicUI(false);
-        }
-
-        function updateMicUI(listening) {
-            const micBtn = document.getElementById('micBtn');
-            const micPulse = document.getElementById('micPulse');
-            const statusText = document.getElementById('micStatusText');
-
-            if (listening) {
-                micBtn.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
-                micBtn.classList.add('bg-red-600', 'hover:bg-red-700');
-                micPulse.classList.remove('hidden');
-                statusText.innerText = "Mendengarkan... Silakan Bicara";
-                statusText.classList.add('text-red-600');
-            } else {
-                micBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
-                micBtn.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
-                micPulse.classList.add('hidden');
-                statusText.innerText = "Tekan Mikrofon Lalu Bicara Bebas";
-                statusText.classList.remove('text-red-600');
-            }
+        function clearTextInput() {
+            document.getElementById('rawTextInput').value = '';
         }
 
         async function processWithGemini() {
-            const speechText = document.getElementById('rawSpeechInput').value.trim();
+            const speechText = document.getElementById('rawTextInput').value.trim();
             if (!speechText) {
-                showToast("Belum ada ucapan suara atau teks yang dimasukkan!");
+                showToast("Belum ada teks belanjaan yang dimasukkan!");
                 return;
             }
 
-            stopListening();
             document.getElementById('aiLoading').classList.remove('hidden');
             document.getElementById('processAiBtn').disabled = true;
 
@@ -290,7 +191,7 @@
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
 
             const systemPrompt = `Anda adalah asisten cerdas pencatat bon belanjaan toko sayur. 
-Tugas Anda adalah mengurai ucapan bahasa Indonesia kasual/pasar menjadi data JSON berstruktur rapi per hari.
+Tugas Anda adalah mengurai teks catatan belanjaan pasar menjadi data JSON berstruktur rapi per hari.
 
 Format JSON yang HARUS dikembalikan:
 {
@@ -300,9 +201,8 @@ Format JSON yang HARUS dikembalikan:
       "dayName": "Senin / Selasa / Rabu / Kamis / Jumat / Sabtu / Minggu",
       "items": [
         {
-          "name": "Nama Barang",
-          "qty": "Ukuran/Jumlah/Satuan (misal: 1kg, 2kg, 1 liter, 500gr, atau -)",
-          "price": 75000
+          "name": "Nama Barang beserta ukuran/kuantitas utuh (misal: 'Daging 1kg', 'Telur 1/2kg', 'Minyak 2 liter', 'Cabai Merah')",
+          "price": 100000
         }
       ],
       "subtotal": 100000
@@ -312,24 +212,16 @@ Format JSON yang HARUS dikembalikan:
 }
 
 Aturan Penafsiran Angka & Kata Pasar:
-1. Pahami kata-kata: "ribu" = 000, "rb" = 000, "k" = 000, "setengah kilo" = 0.5kg, "seperempat" = 250g. Contoh "75ribu" -> 75000, "100rb" -> 100000, "20rb" -> 20000.
-2. Jika ada nama hari seperti "senin", "selasa", "rabu", pisahkan transaksi menjadi bagian kelompok hari tersebut.
-3. Abaikan kata-kata perintah seperti "totalkan", "lalu", "tolong dihitung", "dan".
-4. Pastikan hitung subtotal per hari dan grandTotal secara akurat sesuai penjumlahan harga item.
+1. SERTAKAN ukuran/kuantitas (seperti 1kg, 2kg, 1/2kg, 500gr, 1 liter) LANGSUNG di dalam properti "name". Jangan memotong kata ukuran dari nama barang!
+2. Pahami angka harga: "100" = 100000 (jika konteks pasar/ribu), "100ribu" = 100000, "75" = 75000, "20rb" = 20000, "15" = 15000.
+3. Jika ada nama hari seperti "senin", "selasa", "rabu", pisahkan transaksi menjadi bagian kelompok hari tersebut.
+4. Jangan menambahkan karakter titik dua (:) atau karakter aneh di dalam nama barang.
 5. Kirimkan HANYA JSON murni tanpa markdown fence atau penjelasan tambahan.`;
 
             const payload = {
-                contents: [
-                    {
-                        parts: [{ text: speechText }]
-                    }
-                ],
-                systemInstruction: {
-                    parts: [{ text: systemPrompt }]
-                },
-                generationConfig: {
-                    responseMimeType: "application/json"
-                }
+                contents: [{ parts: [{ text: speechText }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                generationConfig: { responseMimeType: "application/json" }
             };
 
             try {
@@ -339,9 +231,7 @@ Aturan Penafsiran Angka & Kata Pasar:
                     body: JSON.stringify(payload)
                 });
 
-                if (!response.ok) {
-                    throw new Error(`HTTP Error status: ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`HTTP Error status: ${response.status}`);
 
                 const result = await response.json();
                 const candidate = result.candidates?.[0];
@@ -351,7 +241,6 @@ Aturan Penafsiran Angka & Kata Pasar:
                     const parsed = JSON.parse(jsonText);
                     parsedReceiptData = parsed;
 
-                    // Update customer name if detected by AI
                     if (parsed.customerName && !document.getElementById('customerName').value) {
                         document.getElementById('customerName').value = parsed.customerName;
                     }
@@ -373,33 +262,39 @@ Aturan Penafsiran Angka & Kata Pasar:
             }
         }
 
+        // PARSER LOKAL CADANGAN DENGAN PENDETEKSI UKURAN (1kg, 1/2kg, DLL)
         function fallbackLocalParsing(text) {
             const daysList = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'jumaat', 'sabtu', 'minggu'];
             let currentDay = "Senin";
             let daysMap = {};
 
-            const words = text.toLowerCase().split(/\s+/);
-            let currentPhrase = "";
-
-            text.toLowerCase().split(/(senin|selasa|rabu|kamis|jumat|sabtu|minggu)/gi).forEach((part, idx) => {
+            text.toLowerCase().split(/(senin|selasa|rabu|kamis|jumat|sabtu|minggu)/gi).forEach((part) => {
                 let trimmed = part.trim();
                 if (daysList.includes(trimmed)) {
                     currentDay = trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
                     if (!daysMap[currentDay]) daysMap[currentDay] = [];
                 } else if (trimmed) {
                     if (!daysMap[currentDay]) daysMap[currentDay] = [];
-                    // Extract items basic
                     const itemsRaw = trimmed.split(/,|dan|lalu|totalkan/gi);
                     itemsRaw.forEach(raw => {
-                        let priceMatch = raw.match(/(\d+)\s*(ribu|rb|k)?/i);
-                        if (priceMatch) {
-                            let price = parseInt(priceMatch[1]);
-                            if (priceMatch[2] || price < 500) price *= 1000;
-                            let name = raw.replace(/(\d+)\s*(ribu|rb|k)?/gi, '').replace(/hari/gi, '').trim();
-                            if (name) {
+                        raw = raw.trim();
+                        if (!raw) return;
+
+                        const priceMatches = [...raw.matchAll(/(\d+)\s*(ribu|rb|k)?/gi)];
+                        if (priceMatches.length > 0) {
+                            const lastMatch = priceMatches[priceMatches.length - 1];
+                            let price = parseInt(lastMatch[1], 10);
+                            
+                            if (lastMatch[2] || price < 500) {
+                                price *= 1000;
+                            }
+
+                            let namePart = raw.substring(0, lastMatch.index).trim();
+                            namePart = cleanItemName(namePart);
+
+                            if (namePart) {
                                 daysMap[currentDay].push({
-                                    name: name.charAt(0).toUpperCase() + name.slice(1),
-                                    qty: "1",
+                                    name: capitalize(namePart),
                                     price: price
                                 });
                             }
@@ -431,6 +326,20 @@ Aturan Penafsiran Angka & Kata Pasar:
             renderReceipt();
         }
 
+        function cleanItemName(name) {
+            if (!name) return '';
+            return name
+                .replace(/^hari\s+\w+/gi, '')
+                .replace(/^[:\.\,\-\s]+/, '')
+                .replace(/[:\.\,]+$/, '')
+                .trim();
+        }
+
+        function capitalize(str) {
+            if (!str) return '';
+            return str.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        }
+
         function renderReceipt() {
             updateReceiptHeader();
             const container = document.getElementById('dayGroupsContainer');
@@ -439,7 +348,7 @@ Aturan Penafsiran Angka & Kata Pasar:
             if (!parsedReceiptData.days || parsedReceiptData.days.length === 0) {
                 container.innerHTML = `
                     <div class="text-center py-6 text-slate-400 italic text-xs">
-                        Belum ada data belanja. Silakan rekam suara ucapan di atas.
+                        Belum ada data belanja. Silakan ketikkan daftar belanja di atas.
                     </div>`;
                 document.getElementById('grandTotalDisplay').innerText = "Rp 0";
                 dataStatusTag.innerText = "Kosong";
@@ -457,30 +366,24 @@ Aturan Penafsiran Angka & Kata Pasar:
                 calculatedGrandTotal += dayGroup.subtotal || 0;
 
                 html += `
-                <div class="border-b border-slate-300 pb-3 space-y-1.5">
-                    <!-- Day Header -->
-                    <div class="flex justify-between items-center font-extrabold text-slate-900 border-b border-slate-200 pb-1 text-xs tracking-wide">
+                <div class="border-b border-slate-200 pb-3 space-y-2">
+                    <div class="flex justify-between items-center font-extrabold text-emerald-900 border-b border-slate-200 pb-1 text-xs tracking-wider">
                         <span>HARI ${dayGroup.dayName.toUpperCase()}</span>
-                        <span class="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded border border-slate-300">Rincian</span>
+                        <span class="text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded border border-emerald-200 font-semibold">Rincian</span>
                     </div>
 
-                    <!-- Items Table -->
-                    <div class="space-y-1 pt-1">
+                    <div class="space-y-1.5 pt-1">
                         ${dayGroup.items.map((item, idx) => `
-                            <div class="flex justify-between items-start text-slate-800 text-xs">
-                                <div class="pr-2">
-                                    <span class="font-bold">${idx + 1}. ${item.name}</span>
-                                    <span class="text-[10px] text-slate-500 font-sans block">${item.qty ? item.qty : ''}</span>
-                                </div>
-                                <span class="font-bold whitespace-nowrap">${formatRp(item.price)}</span>
+                            <div class="flex justify-between items-center text-slate-800 text-xs">
+                                <span class="font-bold text-slate-800">${idx + 1}.${cleanItemName(item.name)}</span>
+                                <span class="font-extrabold text-slate-900 whitespace-nowrap">${formatRp(item.price)}</span>
                             </div>
                         `).join('')}
                     </div>
 
-                    <!-- Day Subtotal -->
-                    <div class="flex justify-between items-center pt-1 mt-1 border-t border-dotted border-slate-300 font-bold text-slate-900">
+                    <div class="flex justify-between items-center pt-1.5 mt-1 border-t border-dashed border-slate-300 font-bold text-xs text-slate-800">
                         <span>SUBTOTAL ${dayGroup.dayName.toUpperCase()}:</span>
-                        <span>${formatRp(dayGroup.subtotal)}</span>
+                        <span class="font-extrabold">${formatRp(dayGroup.subtotal)}</span>
                     </div>
                 </div>`;
             });
@@ -493,29 +396,94 @@ Aturan Penafsiran Angka & Kata Pasar:
             return 'Rp ' + (num || 0).toLocaleString('id-ID');
         }
 
-        function downloadReceiptImage() {
+        // --- DOWNLOAD JPG PER HARI ---
+        async function downloadReceiptImagesPerDay() {
             if (!parsedReceiptData.days || parsedReceiptData.days.length === 0) {
                 showToast("Tidak ada data bon untuk di-download!");
                 return;
             }
 
-            showToast("Menyiapkan gambar nota...");
-            const receiptElement = document.getElementById('printableReceipt');
+            const storeName = (document.getElementById('storeName').value.trim() || "BON SAYURAN NASIR").toUpperCase();
+            const custName = document.getElementById('customerName').value.trim() || 'Pelanggan';
+            const today = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            
+            let calculatedGrandTotal = parsedReceiptData.grandTotal || parsedReceiptData.days.reduce((sum, d) => sum + d.subtotal, 0);
 
-            html2canvas(receiptElement, {
-                scale: 3,
-                backgroundColor: "#ffffff"
-            }).then(canvas => {
-                const link = document.createElement('a');
-                const custName = document.getElementById('customerName').value.trim() || 'Pelanggan';
-                link.download = `Bon-Sayur-${custName}-${Date.now()}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-                showToast("Gambar bon berhasil didownload!");
-            }).catch(err => {
-                console.error("Download image error:", err);
-                showToast("Gagal mengunduh gambar.");
-            });
+            const exportContainer = document.getElementById('exportRenderContainer');
+            showToast(`Menyiapkan ${parsedReceiptData.days.length} file gambar (.jpg)...`);
+
+            const totalDays = parsedReceiptData.days.length;
+
+            for (let i = 0; i < totalDays; i++) {
+                const dayGroup = parsedReceiptData.days[i];
+                const isLastDay = (i === totalDays - 1);
+
+                exportContainer.innerHTML = `
+                    <div class="bg-white p-6 border-2 border-slate-300 rounded-xl space-y-4 shadow-sm">
+                        <div class="text-center border-b-2 border-slate-200 pb-3 space-y-1">
+                            <h2 class="font-extrabold text-lg tracking-wide text-emerald-900">${storeName}</h2>
+                            <p class="text-xs font-semibold text-slate-700">Pelanggan: ${custName}</p>
+                            <p class="text-[11px] text-slate-500">Tanggal: ${today}</p>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center font-extrabold text-emerald-900 border-b border-slate-300 pb-1 text-xs tracking-wider">
+                                <span>NOTA HARI ${dayGroup.dayName.toUpperCase()}</span>
+                            </div>
+
+                            <div class="space-y-2 pt-1">
+                                ${dayGroup.items.map((item, idx) => `
+                                    <div class="flex justify-between items-center text-slate-800 text-xs">
+                                        <span class="font-bold text-slate-800">${idx + 1}.${cleanItemName(item.name)}</span>
+                                        <span class="font-extrabold text-slate-900 whitespace-nowrap">${formatRp(item.price)}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+
+                            <!-- Subtotal Hari Ini -->
+                            <div class="flex justify-between items-center pt-2 mt-2 border-t border-dashed border-slate-300 font-bold text-xs text-slate-800">
+                                <span>SUBTOTAL ${dayGroup.dayName.toUpperCase()}:</span>
+                                <span class="font-extrabold">${formatRp(dayGroup.subtotal)}</span>
+                            </div>
+
+                            <!-- TOTAL KESELURUHAN HANYA DITAMPILKAN DI HARI PALING AKHIR -->
+                            ${isLastDay ? `
+                            <div class="flex justify-between items-center pt-2.5 mt-2.5 border-t-2 border-slate-900 font-extrabold text-base text-slate-900">
+                                <span>TOTAL KESELURUHAN:</span>
+                                <span class="text-emerald-800">${formatRp(calculatedGrandTotal)}</span>
+                            </div>
+                            ` : ''}
+                        </div>
+
+                        <div class="text-center text-[11px] font-medium text-slate-500 pt-3 border-t border-dashed border-slate-200">
+                            <p>Matur Nuwun / Terima Kasih Atas Kepercayaannya</p>
+                        </div>
+                    </div>
+                `;
+
+                try {
+                    const canvas = await html2canvas(exportContainer, {
+                        scale: 3,
+                        backgroundColor: "#ffffff",
+                        logging: false
+                    });
+
+                    const link = document.createElement('a');
+                    const cleanCust = custName.replace(/\s+/g, '_');
+                    const cleanDay = dayGroup.dayName.toUpperCase().replace(/\s+/g, '_');
+                    
+                    link.download = `Bon-Sayur-${cleanCust}-${cleanDay}.jpg`;
+                    link.href = canvas.toDataURL('image/jpeg', 0.95);
+                    link.click();
+
+                    await new Promise(resolve => setTimeout(resolve, 400));
+                } catch (err) {
+                    console.error("Gagal export per hari:", err);
+                }
+            }
+
+            exportContainer.innerHTML = '';
+            showToast(`${parsedReceiptData.days.length} Foto JPG berhasil diunduh!`);
         }
 
         function shareToWhatsApp() {
@@ -524,7 +492,7 @@ Aturan Penafsiran Angka & Kata Pasar:
                 return;
             }
 
-            const storeName = document.getElementById('storeName').value.trim() || "Bon Sayuran Bapak";
+            const storeName = document.getElementById('storeName').value.trim() || "Bon Sayuran NASIR";
             const custName = document.getElementById('customerName').value.trim();
 
             let text = `*${storeName.toUpperCase()}*\n`;
@@ -534,7 +502,7 @@ Aturan Penafsiran Angka & Kata Pasar:
             parsedReceiptData.days.forEach(day => {
                 text += `\n📌 *HARI ${day.dayName.toUpperCase()}*\n`;
                 day.items.forEach((item, idx) => {
-                    text += `${idx + 1}. ${item.name} ${item.qty ? '(' + item.qty + ')' : ''} = ${formatRp(item.price)}\n`;
+                    text += `${idx + 1}. ${cleanItemName(item.name)} = ${formatRp(item.price)}\n`;
                 });
                 text += `*Subtotal ${day.dayName}: ${formatRp(day.subtotal)}*\n`;
             });
@@ -551,7 +519,7 @@ Aturan Penafsiran Angka & Kata Pasar:
         function resetAllData() {
             if (confirm("Apakah Bapak yakin ingin menghapus semua catatan nota ini?")) {
                 parsedReceiptData = { customerName: "", days: [], grandTotal: 0 };
-                document.getElementById('rawSpeechInput').value = '';
+                document.getElementById('rawTextInput').value = '';
                 document.getElementById('customerName').value = '';
                 saveLocalStorage();
                 renderReceipt();
