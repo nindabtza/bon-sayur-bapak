@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bon Sayur NASIR</title>
+    <title>Bon Sayur AI Bapak</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/png" href="logo-sayur.png">
-    <link rel="apple-touch-icon" href="logo-sayur.png">
 
     <style>
         body {
@@ -31,7 +29,7 @@
                     <i data-lucide="bot" class="w-6 h-6 text-emerald-200"></i>
                 </div>
                 <div>
-                    <h1 class="font-extrabold text-lg leading-tight tracking-wide">Bon Sayur NASIR</h1>
+                    <h1 class="font-extrabold text-lg leading-tight tracking-wide">Bon Sayur AI</h1>
                     <p class="text-[11px] text-emerald-200">Pembuat Nota Otomatis Per Hari</p>
                 </div>
             </div>
@@ -59,10 +57,11 @@
 
                 <p class="text-xs text-slate-500 leading-relaxed">
                     Ketik atau tempel catatan belanja harian Bapak di sini:<br>
+                    <span class="italic text-emerald-700 font-medium">Contoh: "Hari senin cumi 120, udang 60, bloco 35, telor 65. Hari selasa minyak 2 liter 35"</span>
                 </p>
 
                 <!-- Expanded Textarea Input -->
-                <textarea id="rawTextInput" rows="8" class="w-full text-sm font-medium text-slate-800 bg-slate-50 p-3.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:bg-white focus:outline-none resize-y leading-relaxed transition shadow-inner" placeholder="Contoh: Hari senin Daging 1kg 100, Telur 1/2kg 15, Bawang Merah 1kg 20. Hari selasa Minyak 2 liter 35, Tepung 15"></textarea>
+                <textarea id="rawTextInput" rows="8" class="w-full text-sm font-medium text-slate-800 bg-slate-50 p-3.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:bg-white focus:outline-none resize-y leading-relaxed transition shadow-inner" placeholder="Tuliskan daftar belanja di sini... (Hari Senin, Hari Selasa, dst.)"></textarea>
                 
                 <button id="processAiBtn" onclick="processWithGemini()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl text-xs font-bold shadow-md flex items-center justify-center gap-2 transition">
                     <i data-lucide="sparkles" class="w-4 h-4 text-yellow-300"></i> Diproses dengan AI Sekarang
@@ -87,7 +86,7 @@
                 </div>
                 <div>
                     <label class="block text-[11px] text-slate-500 mb-1 font-medium">Nama Toko/Bapak</label>
-                    <input type="text" id="storeName" oninput="updateReceiptHeader()" value="Bon Sayuran NASIR" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                    <input type="text" id="storeName" oninput="updateReceiptHeader()" value="Bon Sayuran Bapak" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                 </div>
             </div>
         </section>
@@ -103,7 +102,7 @@
                 
                 <!-- Receipt Header -->
                 <div class="text-center border-b-2 border-slate-200 pb-3 space-y-1">
-                    <h2 id="receiptStoreTitle" class="font-extrabold text-base tracking-wide uppercase text-emerald-900">BON SAYURAN NASIR</h2>
+                    <h2 id="receiptStoreTitle" class="font-extrabold text-base tracking-wide uppercase text-emerald-900">BON SAYURAN BAPAK</h2>
                     <p id="receiptCustomerText" class="text-xs font-semibold text-slate-600">Pelanggan: Umum / Tanpa Nama</p>
                     <p id="receiptDateText" class="text-[11px] text-slate-500">Tanggal: -</p>
                 </div>
@@ -171,7 +170,7 @@
             const custName = document.getElementById('customerName').value.trim();
             const storeName = document.getElementById('storeName').value.trim();
 
-            document.getElementById('receiptStoreTitle').innerText = (storeName || "BON SAYURAN NASIR").toUpperCase();
+            document.getElementById('receiptStoreTitle').innerText = (storeName || "BON SAYURAN BAPAK").toUpperCase();
             document.getElementById('receiptCustomerText').innerText = 'Pelanggan: ' + (custName || "Umum / Pelanggan");
         }
 
@@ -203,7 +202,7 @@ Format JSON yang HARUS dikembalikan:
       "dayName": "Senin / Selasa / Rabu / Kamis / Jumat / Sabtu / Minggu",
       "items": [
         {
-          "name": "Nama Barang beserta ukuran/kuantitas utuh (misal: 'Daging 1kg', 'Telur 1/2kg', 'Minyak 2 liter', 'Cabai Merah')",
+          "name": "Nama Barang beserta ukuran/kuantitas utuh (misal: 'Daging 1kg', 'Udang', 'Telur 1/2kg', 'Minyak 2 liter', 'Cabai Merah')",
           "price": 100000
         }
       ],
@@ -214,11 +213,12 @@ Format JSON yang HARUS dikembalikan:
 }
 
 Aturan Penafsiran Angka & Kata Pasar:
-1. SERTAKAN ukuran/kuantitas (seperti 1kg, 2kg, 1/2kg, 500gr, 1 liter) LANGSUNG di dalam properti "name". Jangan memotong kata ukuran dari nama barang!
-2. Pahami angka harga: "100" = 100000 (jika konteks pasar/ribu), "100ribu" = 100000, "75" = 75000, "20rb" = 20000, "15" = 15000.
-3. Jika ada nama hari seperti "senin", "selasa", "rabu", pisahkan transaksi menjadi bagian kelompok hari tersebut.
-4. Jangan menambahkan karakter titik dua (:) atau karakter aneh di dalam nama barang.
-5. Kirimkan HANYA JSON murni tanpa markdown fence atau penjelasan tambahan.`;
+1. JANGAN PERNAH menyingkat nama barang! Tuliskan nama barang secara utuh sesuai input (contoh: 'udang' tetap 'Udang', bukan 'G' atau '60g').
+2. SERTAKAN ukuran/kuantitas (seperti 1kg, 2kg, 1/2kg, 500gr, 1 liter) LANGSUNG di dalam properti "name" jika ada.
+3. Pahami angka harga: "100" = 100000 (jika konteks pasar/ribu), "100ribu" = 100000, "60" = 60000, "35" = 35000, "20rb" = 20000, "15" = 15000.
+4. Jika ada nama hari seperti "senin", "selasa", "rabu", pisahkan transaksi menjadi bagian kelompok hari tersebut.
+5. Jangan menambahkan karakter titik dua (:) atau karakter aneh di dalam nama barang.
+6. Kirimkan HANYA JSON murni tanpa markdown fence atau penjelasan tambahan.`;
 
             const payload = {
                 contents: [{ parts: [{ text: speechText }] }],
@@ -264,7 +264,7 @@ Aturan Penafsiran Angka & Kata Pasar:
             }
         }
 
-        // PARSER LOKAL CADANGAN DENGAN PENDETEKSI UKURAN (1kg, 1/2kg, DLL)
+        // PARSER LOKAL CADANGAN DENGAN PERBAIKAN FILTER KATA
         function fallbackLocalParsing(text) {
             const daysList = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'jumaat', 'sabtu', 'minggu'];
             let currentDay = "Senin";
@@ -331,7 +331,8 @@ Aturan Penafsiran Angka & Kata Pasar:
         function cleanItemName(name) {
             if (!name) return '';
             return name
-                .replace(/^hari\s+\w+/gi, '')
+                // Hanya menghapus kata 'hari' jika berdiri sendiri sebagai kata utuh
+                .replace(/\bhari\b\s*\w*/gi, '')
                 .replace(/^[:\.\,\-\s]+/, '')
                 .replace(/[:\.\,]+$/, '')
                 .trim();
@@ -405,7 +406,7 @@ Aturan Penafsiran Angka & Kata Pasar:
                 return;
             }
 
-            const storeName = (document.getElementById('storeName').value.trim() || "BON SAYURAN NASIR").toUpperCase();
+            const storeName = (document.getElementById('storeName').value.trim() || "BON SAYURAN BAPAK").toUpperCase();
             const custName = document.getElementById('customerName').value.trim() || 'Pelanggan';
             const today = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
             
@@ -494,7 +495,7 @@ Aturan Penafsiran Angka & Kata Pasar:
                 return;
             }
 
-            const storeName = document.getElementById('storeName').value.trim() || "Bon Sayuran NASIR";
+            const storeName = document.getElementById('storeName').value.trim() || "Bon Sayuran Bapak";
             const custName = document.getElementById('customerName').value.trim();
 
             let text = `*${storeName.toUpperCase()}*\n`;
@@ -504,7 +505,7 @@ Aturan Penafsiran Angka & Kata Pasar:
             parsedReceiptData.days.forEach(day => {
                 text += `\n📌 *HARI ${day.dayName.toUpperCase()}*\n`;
                 day.items.forEach((item, idx) => {
-                    text += `${idx + 1}. ${cleanItemName(item.name)} = ${formatRp(item.price)}\n`;
+                    text += `${idx + 1}.${cleanItemName(item.name)} = ${formatRp(item.price)}\n`;
                 });
                 text += `*Subtotal ${day.dayName}: ${formatRp(day.subtotal)}*\n`;
             });
