@@ -41,7 +41,7 @@
 
     <main class="max-w-md mx-auto px-4 pt-4 space-y-4">
 
-        <!-- Text Input & AI Trigger Card -->
+        <!-- Text Input Card -->
         <section class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-600"></div>
 
@@ -57,21 +57,15 @@
 
                 <p class="text-xs text-slate-500 leading-relaxed">
                     Ketik atau tempel catatan belanja harian Bapak di sini:<br>
-                    <span class="italic text-emerald-700 font-medium">Contoh: "Hari senin cumi 120, udang 60, bloco 35, telor 65. Hari selasa minyak 2 liter 35"</span>
+                    <span class="italic text-emerald-700 font-medium">Contoh: "senin cumi 120, udang 60, bloco 35, telor 65"</span>
                 </p>
 
                 <!-- Expanded Textarea Input -->
-                <textarea id="rawTextInput" rows="8" class="w-full text-sm font-medium text-slate-800 bg-slate-50 p-3.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:bg-white focus:outline-none resize-y leading-relaxed transition shadow-inner" placeholder="Tuliskan daftar belanja di sini... (Hari Senin, Hari Selasa, dst.)"></textarea>
+                <textarea id="rawTextInput" rows="8" class="w-full text-sm font-medium text-slate-800 bg-slate-50 p-3.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:bg-white focus:outline-none resize-y leading-relaxed transition shadow-inner" placeholder="Tuliskan daftar belanja di sini... (senin cumi 120, udang 60, dst.)"></textarea>
                 
-                <button id="processAiBtn" onclick="processWithGemini()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl text-xs font-bold shadow-md flex items-center justify-center gap-2 transition">
-                    <i data-lucide="sparkles" class="w-4 h-4 text-yellow-300"></i> Diproses dengan AI Sekarang
+                <button id="processAiBtn" onclick="processReceiptText()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl text-xs font-bold shadow-md flex items-center justify-center gap-2 transition">
+                    <i data-lucide="sparkles" class="w-4 h-4 text-yellow-300"></i> Diproses Sekarang
                 </button>
-            </div>
-
-            <!-- AI Loading Indicator -->
-            <div id="aiLoading" class="hidden w-full mt-3 p-3 bg-amber-50 rounded-xl border border-amber-200 text-amber-800 text-xs flex items-center justify-center gap-2 font-medium">
-                <i data-lucide="loader-2" class="w-4 h-4 animate-spin text-amber-600"></i>
-                <span>Gemini AI sedang memisahkan data per hari & menghitung total...</span>
             </div>
         </section>
 
@@ -178,125 +172,60 @@
             document.getElementById('rawTextInput').value = '';
         }
 
-        async function processWithGemini() {
-            const speechText = document.getElementById('rawTextInput').value.trim();
-            if (!speechText) {
+        function capitalize(str) {
+            if (!str) return '';
+            return str.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        }
+
+        // FUNGSI UTAMA PEMPROSES TEKS DENGAN AKURASI TINGGI
+        function processReceiptText() {
+            const rawText = document.getElementById('rawTextInput').value.trim();
+            if (!rawText) {
                 showToast("Belum ada teks belanjaan yang dimasukkan!");
                 return;
             }
 
-            document.getElementById('aiLoading').classList.remove('hidden');
-            document.getElementById('processAiBtn').disabled = true;
-
-            const apiKey = "";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-
-            const systemPrompt = `Anda adalah asisten cerdas pencatat bon belanjaan toko sayur. 
-Tugas Anda adalah mengurai teks catatan belanjaan pasar menjadi data JSON berstruktur rapi per hari.
-
-Format JSON yang HARUS dikembalikan:
-{
-  "customerName": "nama pelanggan jika disebutkan (atau string kosong)",
-  "days": [
-    {
-      "dayName": "Senin / Selasa / Rabu / Kamis / Jumat / Sabtu / Minggu",
-      "items": [
-        {
-          "name": "Nama Barang beserta ukuran/kuantitas utuh (misal: 'Daging 1kg', 'Udang', 'Telur 1/2kg', 'Minyak 2 liter', 'Cabai Merah')",
-          "price": 100000
-        }
-      ],
-      "subtotal": 100000
-    }
-  ],
-  "grandTotal": 100000
-}
-
-Aturan Penafsiran Angka & Kata Pasar:
-1. JANGAN PERNAH menyingkat nama barang! Tuliskan nama barang secara utuh sesuai input (contoh: 'udang' tetap 'Udang', bukan 'G' atau '60g').
-2. SERTAKAN ukuran/kuantitas (seperti 1kg, 2kg, 1/2kg, 500gr, 1 liter) LANGSUNG di dalam properti "name" jika ada.
-3. Pahami angka harga: "100" = 100000 (jika konteks pasar/ribu), "100ribu" = 100000, "60" = 60000, "35" = 35000, "20rb" = 20000, "15" = 15000.
-4. Jika ada nama hari seperti "senin", "selasa", "rabu", pisahkan transaksi menjadi bagian kelompok hari tersebut.
-5. Jangan menambahkan karakter titik dua (:) atau karakter aneh di dalam nama barang.
-6. Kirimkan HANYA JSON murni tanpa markdown fence atau penjelasan tambahan.`;
-
-            const payload = {
-                contents: [{ parts: [{ text: speechText }] }],
-                systemInstruction: { parts: [{ text: systemPrompt }] },
-                generationConfig: { responseMimeType: "application/json" }
-            };
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) throw new Error(`HTTP Error status: ${response.status}`);
-
-                const result = await response.json();
-                const candidate = result.candidates?.[0];
-                const jsonText = candidate?.content?.parts?.[0]?.text;
-
-                if (jsonText) {
-                    const parsed = JSON.parse(jsonText);
-                    parsedReceiptData = parsed;
-
-                    if (parsed.customerName && !document.getElementById('customerName').value) {
-                        document.getElementById('customerName').value = parsed.customerName;
-                    }
-
-                    saveLocalStorage();
-                    renderReceipt();
-                    showToast("AI Berhasil menyusun bon per hari!");
-                } else {
-                    throw new Error("Gagal menerima format dari Gemini API");
-                }
-
-            } catch (err) {
-                console.error("Gemini API Error:", err);
-                showToast("Terjadi kesalahan memproses AI. Mencoba metode parser cadangan...");
-                fallbackLocalParsing(speechText);
-            } finally {
-                document.getElementById('aiLoading').classList.add('hidden');
-                document.getElementById('processAiBtn').disabled = false;
-            }
-        }
-
-        // PARSER LOKAL CADANGAN DENGAN PERBAIKAN FILTER KATA
-        function fallbackLocalParsing(text) {
             const daysList = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'jumaat', 'sabtu', 'minggu'];
             let currentDay = "Senin";
             let daysMap = {};
 
-            text.toLowerCase().split(/(senin|selasa|rabu|kamis|jumat|sabtu|minggu)/gi).forEach((part) => {
-                let trimmed = part.trim();
-                if (daysList.includes(trimmed)) {
-                    currentDay = trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
-                    if (!daysMap[currentDay]) daysMap[currentDay] = [];
-                } else if (trimmed) {
-                    if (!daysMap[currentDay]) daysMap[currentDay] = [];
-                    const itemsRaw = trimmed.split(/,|dan|lalu|totalkan/gi);
-                    itemsRaw.forEach(raw => {
-                        raw = raw.trim();
-                        if (!raw) return;
+            // Pisahkan teks berdasarkan nama hari
+            const tokens = rawText.split(/(senin|selasa|rabu|kamis|jumat|jumaat|sabtu|minggu)/gi);
 
-                        const priceMatches = [...raw.matchAll(/(\d+)\s*(ribu|rb|k)?/gi)];
-                        if (priceMatches.length > 0) {
-                            const lastMatch = priceMatches[priceMatches.length - 1];
-                            let price = parseInt(lastMatch[1], 10);
-                            
-                            if (lastMatch[2] || price < 500) {
+            tokens.forEach((part) => {
+                let trimmed = part.trim();
+                if (!trimmed) return;
+
+                let lower = trimmed.toLowerCase();
+                if (daysList.includes(lower)) {
+                    currentDay = lower === 'jumaat' ? 'Jumat' : lower.charAt(0).toUpperCase() + lower.slice(1);
+                    if (!daysMap[currentDay]) daysMap[currentDay] = [];
+                } else {
+                    if (!daysMap[currentDay]) daysMap[currentDay] = [];
+                    
+                    // Pisahkan per item berdasarkan koma atau baris baru
+                    const itemsRaw = trimmed.split(/,|\n/gi);
+                    
+                    itemsRaw.forEach(itemStr => {
+                        let str = itemStr.trim();
+                        if (!str) return;
+
+                        // Ekstrak angka harga di bagian PALING AKHIR string (contoh: udang 60 -> harga 60, barang udang)
+                        const match = str.match(/^(.*?)\s+(\d+)\s*(ribu|rb|k)?$/i);
+                        
+                        if (match) {
+                            let itemName = match[1].replace(/^[:\.\,\-\s]+/, '').trim();
+                            let price = parseInt(match[2], 10);
+                            let unit = match[3];
+
+                            // Konversi pecahan ribuan (misal: 60 -> 60000, 120 -> 120000)
+                            if (unit || price < 500) {
                                 price *= 1000;
                             }
 
-                            let namePart = raw.substring(0, lastMatch.index).trim();
-                            namePart = cleanItemName(namePart);
-
-                            if (namePart) {
+                            if (itemName) {
                                 daysMap[currentDay].push({
-                                    name: capitalize(namePart),
+                                    name: capitalize(itemName),
                                     price: price
                                 });
                             }
@@ -320,27 +249,14 @@ Aturan Penafsiran Angka & Kata Pasar:
             }
 
             parsedReceiptData = {
-                customerName: document.getElementById('customerName').value,
+                customerName: document.getElementById('customerName').value.trim(),
                 days: daysResult,
                 grandTotal: grandTotal
             };
 
+            saveLocalStorage();
             renderReceipt();
-        }
-
-        function cleanItemName(name) {
-            if (!name) return '';
-            return name
-                // Hanya menghapus kata 'hari' jika berdiri sendiri sebagai kata utuh
-                .replace(/\bhari\b\s*\w*/gi, '')
-                .replace(/^[:\.\,\-\s]+/, '')
-                .replace(/[:\.\,]+$/, '')
-                .trim();
-        }
-
-        function capitalize(str) {
-            if (!str) return '';
-            return str.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+            showToast("Berhasil menyusun nota!");
         }
 
         function renderReceipt() {
@@ -378,7 +294,7 @@ Aturan Penafsiran Angka & Kata Pasar:
                     <div class="space-y-1.5 pt-1">
                         ${dayGroup.items.map((item, idx) => `
                             <div class="flex justify-between items-center text-slate-800 text-xs">
-                                <span class="font-bold text-slate-800">${idx + 1}.${cleanItemName(item.name)}</span>
+                                <span class="font-bold text-slate-800">${idx + 1}.${item.name}</span>
                                 <span class="font-extrabold text-slate-900 whitespace-nowrap">${formatRp(item.price)}</span>
                             </div>
                         `).join('')}
@@ -437,7 +353,7 @@ Aturan Penafsiran Angka & Kata Pasar:
                             <div class="space-y-2 pt-1">
                                 ${dayGroup.items.map((item, idx) => `
                                     <div class="flex justify-between items-center text-slate-800 text-xs">
-                                        <span class="font-bold text-slate-800">${idx + 1}.${cleanItemName(item.name)}</span>
+                                        <span class="font-bold text-slate-800">${idx + 1}.${item.name}</span>
                                         <span class="font-extrabold text-slate-900 whitespace-nowrap">${formatRp(item.price)}</span>
                                     </div>
                                 `).join('')}
@@ -505,7 +421,7 @@ Aturan Penafsiran Angka & Kata Pasar:
             parsedReceiptData.days.forEach(day => {
                 text += `\n📌 *HARI ${day.dayName.toUpperCase()}*\n`;
                 day.items.forEach((item, idx) => {
-                    text += `${idx + 1}.${cleanItemName(item.name)} = ${formatRp(item.price)}\n`;
+                    text += `${idx + 1}. ${item.name} = ${formatRp(item.price)}\n`;
                 });
                 text += `*Subtotal ${day.dayName}: ${formatRp(day.subtotal)}*\n`;
             });
